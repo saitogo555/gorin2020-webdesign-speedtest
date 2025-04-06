@@ -1,0 +1,37 @@
+services:
+  php:
+    build:
+      context: ./php
+      dockerfile: dockerfile
+      args:
+        UID: 1000
+        GID: 1000
+    user: www-data
+    volumes:
+      - ./php/php.ini:/usr/local/etc/php/php.ini
+      - ./php/000-default.conf:/etc/apache2/sites-available/000-default.conf
+      - ./src:/var/www/html
+    ports:
+      - 8080:80
+    depends_on:
+      - mariadb
+  mariadb:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gorin
+    volumes:
+      - ./mariadb_data:/var/lib/mysql
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - 8081:80
+    depends_on:
+      - mariadb
+
+volumes:
+  mariadb_data:

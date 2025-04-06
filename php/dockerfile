@@ -1,0 +1,51 @@
+FROM php:8.4.5-apache
+
+# シェルの設定
+ENV SHELL /bin/bash
+
+# compose.ymlから引数を受け取る
+ARG UID=1000
+ARG GID=1000
+
+# パッケージリストの更新とパッケージのアップグレード
+RUN apt-get update && apt-get upgrade -y
+
+# 基本パッケージのインストール
+RUN apt-get install sudo zip unzip git -y
+
+# PHPでJPGとPNGを扱うためのパッケージをインストール
+RUN apt-get install -y \
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    zlib1g-dev
+
+# PHPの拡張機能をインストール
+RUN docker-php-ext-install pdo pdo_mysql
+
+# GDの設定（JPGとPNG対応）
+RUN docker-php-ext-configure gd --with-jpeg --with-freetype
+RUN docker-php-ext-install gd
+
+# Apacheの設定
+RUN a2enmod rewrite
+
+# www-dataのUIDとGIDを設定
+RUN groupmod -g ${UID} www-data && \
+    usermod -u ${GID} www-data
+
+# www-dataユーザーをsudoグループに追加
+RUN usermod -aG sudo www-data
+
+# www-dataユーザーにパスワードなしでsudoを実行する権限を付与
+RUN echo "www-data ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+# 作業ディレクトリをプロジェクトルートに設定
+WORKDIR /var/www/html
+
+# フォルダの権限を設定
+RUN chmod -R 755 /var/www && \
+    chown -R www-data:www-data /var/www
+
+# www-dataに切り替え
+USER www-data
