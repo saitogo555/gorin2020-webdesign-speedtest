@@ -38,9 +38,9 @@ srcフォルダ直下がドキュメントルートになります。
 |------------|-------------|
 | HOST       | mariadb     |
 | PORT       | 3306        |
-| DATABASE   | gorin       |
-| USERNAME   | root        |
-| PASSWORD   | root        |
+| DATABASE   | compe2020   |
+| USERNAME   | web         |
+| PASSWORD   | 0202nesoy   |
 
 ## mariadb
 
